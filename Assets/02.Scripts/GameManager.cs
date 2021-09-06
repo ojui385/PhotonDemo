@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,7 +12,6 @@ public class GameManager : MonoBehaviour
 
     public PhotonView pv;
 
-    public bool isConnect = false;
     public Transform[] spawnPoints;
 
     public Text scorePlayer1Text;
@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
 
     private int scorePlayer1 = 0;
     private int scorePlayer2 = 0;
+
+    private Hashtable CP;
 
     private void Awake()
     {
@@ -36,25 +38,25 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         pv = GetComponent<PhotonView>();
-        StartCoroutine(CreatePlayer());
+        CP = PhotonNetwork.LocalPlayer.CustomProperties;
+        CreatePlayer();
     }
 
-    void Update()
+    void CreatePlayer()
     {
-
-
-    }
-
-    IEnumerator CreatePlayer()
-    {
-        yield return new WaitUntil(() => isConnect);
-
         spawnPoints = GameObject.Find("SpawnPointGroup").GetComponentsInChildren<Transform>();
 
         Vector3 pos = spawnPoints[PhotonNetwork.CurrentRoom.PlayerCount].position;
         Quaternion rot = spawnPoints[PhotonNetwork.CurrentRoom.PlayerCount].rotation;
 
         GameObject playerTemp = PhotonNetwork.Instantiate("Player", pos, rot, 0);
+
+        int colorNum = (int)CP["Color"];
+        Debug.Log($"colorNum : {colorNum}");
+        if (colorNum != -1)
+        {
+            playerTemp.GetComponent<PlayerCtrl>().InitColor(colorNum - 1);
+        }
     }
 
     public void GetScore(int playerNum)

@@ -11,6 +11,9 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
+        // 방장이 혼자 씬을 로딩하면, 나머지 사람들은 자동으로 싱크가 됨
+        PhotonNetwork.AutomaticallySyncScene = true;
+
         // 게임 버전 지정
         PhotonNetwork.GameVersion = gameVersion;
 
@@ -26,8 +29,12 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("01. 포톤 서버에 접속");
-        PhotonNetwork.JoinRandomRoom();
 
+    }
+
+    public void OnStartBtn()
+    {
+        PhotonNetwork.JoinRandomRoom();
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -53,7 +60,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("04. 방 입장 완료");
-        GameManager.instance.isConnect = true;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("Level_1");
+        }
     }
 
 }

@@ -26,10 +26,14 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks
     public Material[] playerMt;
     private int idxMt = -1;
 
-    IEnumerator Start()
+    private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
         pv = GetComponent<PhotonView>();
+    }
+
+    IEnumerator Start()
+    {
 
         turnSpeedValue = turnSpeed;
         turnSpeed = 0.0f;
@@ -41,7 +45,7 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks
         }
         else
         {
-            GetComponent<Rigidbody>().isKinematic = true;
+            // GetComponent<Rigidbody>().isKinematic = true;
         }
 
 
@@ -79,30 +83,42 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks
 
     private void OnCollisionEnter(Collision other)
     {
+        if (!pv.IsMine)
+        {
+            return;
+        }
         string coll = other.gameObject.name;
         switch (coll)
         {
             case "Item_1":
-                idxMt = 0;
-                pv.RPC(nameof(SetMt), RpcTarget.AllViaServer, idxMt);
+                ScorePoint(0);
                 break;
             case "Item_2":
-                idxMt = 1;
-                pv.RPC(nameof(SetMt), RpcTarget.AllViaServer, idxMt);
+                ScorePoint(1);
                 break;
             case "Item_3":
-                idxMt = 2;
-                pv.RPC(nameof(SetMt), RpcTarget.AllViaServer, idxMt);
+                ScorePoint(2);
                 break;
         }
 
     }
 
-    [PunRPC]
-    private void SetMt(int idx)
+    public void InitColor(int num)
     {
-        GameManager.instance.GetScore(pv.ViewID / 1000);
+        pv.RPC(nameof(SetMt), RpcTarget.AllViaServer, num);
+    }
+
+    [PunRPC]
+    public void SetMt(int idx)
+    {
         GetComponent<Renderer>().material = playerMt[idx];
+        idxMt = idx;
+    }
+
+    public void ScorePoint(int idx)
+    {
+        pv.RPC(nameof(SetMt), RpcTarget.AllViaServer, idx);
+        GameManager.instance.GetScore(pv.ViewID / 1000);
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
