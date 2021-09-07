@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppSettings:
     AppIdRealtime: a5594295-5210-4317-aa92-91076415f0b8
+    AppIdFusion: 
     AppIdChat: 
-    AppIdVoice: 
+    AppIdVoice: c469f8cb-a5de-4d8c-8445-a31ff13898d1
     AppVersion: 
     UseNameServer: 1
     FixedRegion: 
@@ -41,6 +42,9 @@ MonoBehaviour:
   - ChangeMt
   - SetMt
   - SetScore
+  - CantHearYou
+  - ChangeColour
+  - HeresWhy
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
   DevRegionSetOnce: 1
